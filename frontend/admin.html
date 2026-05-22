@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Infinity Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css?v=3">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box glass-panel">
+            <div class="logo-area">
+                <i class="fa-solid fa-infinity"></i>
+                <h2>Infinity Admin</h2>
+            </div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="adminPassword">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login to Dashboard</button>
+                <div id="loginError" class="error-msg"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="index.html" style="color: #888888; text-decoration: none; font-size: 0.85rem; font-family: 'Inter', sans-serif;"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i>Return to Main Website</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden by default) -->
+    <div id="dashboardContainer" class="dashboard-layout" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-infinity"></i>
+                <h2>Admin</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="#" id="nav-applications" class="nav-btn" data-target="applications-view"><i class="fa-solid fa-file-invoice"></i> Applications</a></li>
+                <li><a href="#" id="nav-settings" class="nav-btn" data-target="settings-view"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                <li><a href="#" id="nav-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar glass-panel">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search applications...">
+                </div>
+                <div class="user-info">
+                    <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
+                    <span>Administrator</span>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="page-header">
+                    <h1>Applications</h1>
+                    <div class="stats">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon pending"><i class="fa-solid fa-clock"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Pending</span>
+                                <h3 id="statPending">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon approved"><i class="fa-solid fa-check"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Approved</span>
+                                <h3 id="statApproved">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon rejected"><i class="fa-solid fa-xmark"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-label">Rejected</span>
+                                <h3 id="statRejected">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container glass-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ref #</th>
+                                <th>Applicant Name</th>
+                                <th>ID Number</th>
+                                <th>Cell Phone</th>
+                                <th>Date Applied</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                            <!-- Rows will be populated via JS -->
+                        </tbody>
+                    </table>
+                    <div class="loading-spinner" id="tableLoading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="content-area" style="display: none;">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="glass-panel" style="padding: 2rem; border-radius: 12px; max-width: 600px;">
+                    <h3>Contact Information</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.875rem;">Update the contact numbers displayed on the main website. You can enter multiple numbers separated by commas; a random number will be selected when a user initiates a chat.</p>
+                    
+                    <div class="input-group">
+                        <label for="setting-whatsapp">WhatsApp Numbers (comma-separated)</label>
+                        <div class="input-wrapper">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <input type="text" id="setting-whatsapp" placeholder="e.g. 27682749288, 27682749289">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                    <div id="settingsMsg" style="margin-top: 1rem; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Application Details</h2>
+                <span class="close-btn" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-footer">
+                <div class="status-actions">
+                    <select id="statusSelect" class="status-dropdown">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <button class="btn btn-primary" id="updateStatusBtn">Update Status</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js?v=4"></script>
+</body>
+</html>

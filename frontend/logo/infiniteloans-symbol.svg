@@ -1,0 +1,15 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+
+  <rect width="500" height="500" fill="#0F2E3D"/>
+
+  <!-- Infinity: two overlapping circles, navy cutout in centre -->
+  <circle cx="185" cy="250" r="95" fill="none" stroke="#C9A24B" stroke-width="38"/>
+  <circle cx="315" cy="250" r="95" fill="none" stroke="#C9A24B" stroke-width="38"/>
+
+  <!-- Centre bridge cover — creates the over/under weave -->
+  <rect x="223" y="193" width="54" height="114" fill="#0F2E3D"/>
+
+  <!-- Re-draw the front arc of the left ring over the bridge -->
+  <path d="M 223 193 A 95 95 0 0 0 223 307" fill="none" stroke="#C9A24B" stroke-width="38"/>
+
+</svg>

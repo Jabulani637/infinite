@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createDocPreview(name, url, icon) {
         if (!url) return `<div class="document-preview"><span><i class="fa-solid ${icon}"></i> ${name}</span><span style="color:var(--danger)">Missing</span></div>`;
         
-        const isPdf = url.toLowerCase().includes('.pdf');
+        const isPdf = url.toLowerCase().includes('.pdf') || url.startsWith('data:application/pdf');
         
         if (isPdf) {
             return `
@@ -399,6 +399,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.data.whatsapp_number) {
                     document.getElementById('setting-whatsapp').value = data.data.whatsapp_number;
                 }
+                if (data.data.business_email) {
+                    document.getElementById('setting-email').value = data.data.business_email;
+                }
             }
         } catch (error) {
             console.error('Error loading settings:', error);
@@ -409,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = e.target;
         const msg = document.getElementById('settingsMsg');
         const whatsapp = document.getElementById('setting-whatsapp').value.trim();
+        const email = document.getElementById('setting-email').value.trim();
         
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
@@ -416,17 +420,30 @@ document.addEventListener('DOMContentLoaded', () => {
         msg.textContent = '';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/settings`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': authToken
-                },
-                body: JSON.stringify({ key: 'whatsapp_number', value: whatsapp })
-            });
-            const data = await response.json();
-            
-            if (data.success) {
+            // Save both settings
+            const promises = [
+                fetch(`${API_BASE_URL}/admin/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken
+                    },
+                    body: JSON.stringify({ key: 'whatsapp_number', value: whatsapp })
+                }),
+                fetch(`${API_BASE_URL}/admin/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken
+                    },
+                    body: JSON.stringify({ key: 'business_email', value: email })
+                })
+            ];
+
+            const results = await Promise.all(promises);
+            const allSuccessful = results.every(r => r.ok);
+
+            if (allSuccessful) {
                 msg.textContent = 'Settings saved successfully!';
                 msg.style.color = 'var(--success)';
             } else {

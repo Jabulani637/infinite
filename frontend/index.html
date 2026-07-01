@@ -191,8 +191,22 @@
                             <input type="text" id="bankName" placeholder="e.g. FNB, Capitec" required>
                         </div>
                         <div class="field">
+                            <label>Bank Code (Branch Code) <span class="required">*</span></label>
+                            <input type="text" id="bankCode" placeholder="e.g. 250655" required>
+                        </div>
+                        <div class="field">
                             <label>Account Number <span class="required">*</span></label>
                             <input type="text" id="accNum" placeholder="1234567890" required>
+                        </div>
+                        <div class="field">
+                            <label>Account Type <span class="required">*</span></label>
+                            <select id="accType" required>
+                                <option value="">Select account type...</option>
+                                <option value="Savings">Savings Account</option>
+                                <option value="Cheque">Cheque Account</option>
+                                <option value="Transmission">Transmission Account</option>
+                                <option value="Credit">Credit Card</option>
+                            </select>
                         </div>
                         <div class="field">
                             <label>Loan Purpose <span class="required">*</span></label>

@@ -154,7 +154,7 @@ async function submitApp() {
   Object.keys(uploadedFiles).forEach(key => formData.append(key, uploadedFiles[key]));
 
   try {
-    const response = await fetch('/api/apply', {
+    const response = await fetch(`${API_BASE_URL}/apply`, {
       method: 'POST',
       body: formData
     });
@@ -420,7 +420,7 @@ async function initWhatsApp() {
 
   let adminNumbers = ["27682749288"]; // fallback
   try {
-      const res = await fetch('/api/settings');
+      const res = await fetch(`${API_BASE_URL}/settings`);
       const data = await res.json();
       if (data.success && data.data.whatsapp_number) {
           adminNumbers = data.data.whatsapp_number.split(',').map(num => num.trim()).filter(num => num.length > 0);

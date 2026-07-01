@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE_URL = '/api'; // Adjusted if backend runs on same origin, otherwise 'http://localhost:3000/api'
     
     // UI Elements
     const loginScreen = document.getElementById('loginScreen');
@@ -231,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Modal Functions
-    function openDetailsModal(id) {
+    async function openDetailsModal(id) {
         const app = applicationsData.find(a => a.id == id);
         if (!app) return;
         
@@ -239,8 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
         statusSelect.value = app.status || 'Pending';
         
         const dob = new Date(app.dob).toLocaleDateString();
-        
-        let html = `
+
+        // Show modal with a loading state while we fetch signed URLs
+        modalBody.innerHTML = `
             <div class="details-grid">
                 <div class="detail-section">
                     <h3>Personal Information</h3>
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <div class="detail-section">
-                    <h3>Loan Details & Bank</h3>
+                    <h3>Loan Details &amp; Bank</h3>
                     <div class="detail-item"><span class="label">Amount Requested</span><span class="value" style="color: var(--primary-color);">R ${app.loan_amount || '0.00'}</span></div>
                     <div class="detail-item"><span class="label">Term (Months)</span><span class="value">${app.term_months || '0'}</span></div>
                     <div class="detail-item"><span class="label">Total Expected</span><span class="value">R ${app.total_settlement || '0.00'}</span></div>
@@ -275,27 +275,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="detail-section" style="grid-column: 1 / -1;">
                     <h3>Uploaded Documents</h3>
-                    <div class="document-gallery">
-                        ${createDocPreview('ID Document', app.path_id, 'fa-id-card')}
-                        ${createDocPreview('Student Card', app.path_student_card, 'fa-address-card')}
-                        ${createDocPreview('Proof of Registration', app.path_registration, 'fa-file-lines')}
-                        ${createDocPreview('Bank Statement', app.path_bank_statement, 'fa-file-invoice-dollar')}
-                        ${createDocPreview('Selfie', app.path_selfie, 'fa-camera')}
-                        ${createDocPreview('NSFAS Status', app.path_nsfas, 'fa-file-contract')}
-                        ${createDocPreview('Proof of Address', app.path_address, 'fa-house')}
+                    <div class="document-gallery" id="docGallery">
+                        <p style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading documents...</p>
                     </div>
                 </div>
             </div>
         `;
-        
-        modalBody.innerHTML = html;
         detailsModal.style.display = 'flex';
+
+        // Fetch signed URLs for all documents in parallel
+        const docFields = [
+            { label: 'ID Document',          path: app.path_id,            icon: 'fa-id-card' },
+            { label: 'Student Card',          path: app.path_student_card,  icon: 'fa-address-card' },
+            { label: 'Proof of Registration', path: app.path_registration,  icon: 'fa-file-lines' },
+            { label: 'Bank Statement',        path: app.path_bank_statement, icon: 'fa-file-invoice-dollar' },
+            { label: 'Selfie',               path: app.path_selfie,         icon: 'fa-camera' },
+            { label: 'NSFAS Status',          path: app.path_nsfas,         icon: 'fa-file-contract' },
+            { label: 'Proof of Address',      path: app.path_address,       icon: 'fa-house' },
+        ];
+
+        const signedUrlResults = await Promise.all(docFields.map(async (doc) => {
+            if (!doc.path) return { ...doc, signedUrl: null };
+            try {
+                const resp = await fetch(`${API_BASE_URL}/admin/document-url?path=${encodeURIComponent(doc.path)}`, {
+                    headers: { 'Authorization': authToken }
+                });
+                const result = await resp.json();
+                return { ...doc, signedUrl: result.success ? result.url : null };
+            } catch {
+                return { ...doc, signedUrl: null };
+            }
+        }));
+
+        const gallery = document.getElementById('docGallery');
+        if (gallery) {
+            gallery.innerHTML = signedUrlResults.map(doc => createDocPreview(doc.label, doc.signedUrl, doc.icon)).join('');
+        }
     }
 
     function createDocPreview(name, url, icon) {
         if (!url) return `<div class="document-preview"><span><i class="fa-solid ${icon}"></i> ${name}</span><span style="color:var(--danger)">Missing</span></div>`;
         
-        const isPdf = url.toLowerCase().includes('.pdf') || url.startsWith('data:application/pdf');
+        const isPdf = url.toLowerCase().includes('.pdf') || url.includes('content-type=application%2Fpdf');
         
         if (isPdf) {
             return `
@@ -312,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="${url}" target="_blank">
                     <img src="${url}" alt="${name}" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22120%22 viewBox=%220 0 150 120%22%3E%3Crect width=%22150%22 height=%22120%22 fill=%22%231e293b%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%2394a3b8%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo Preview%3C/text%3E%3C/svg%3E';">
                 </a>
+                <a href="${url}" target="_blank" style="font-size:0.75rem; color:var(--primary-color); margin-top:0.5rem; text-decoration:none;">Open Full <i class="fa-solid fa-external-link-alt"></i></a>
             </div>
             `;
         }

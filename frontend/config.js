@@ -1,2 +1,2 @@
 
-const API_BASE_URL = "https://infinite-backend-wnz2.onrender.com/api";
+const API_BASE_URL = "https://infinite-147r.onrender.com/api";

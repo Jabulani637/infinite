@@ -103,63 +103,77 @@ function setStep(n) {
 }
 
 async function submitApp() {
-  const checks = ['chk1', 'chk2', 'chk3'];
-  const unchecked = checks.filter(id => {
-    const el = document.getElementById(id);
-    return el && el.type === 'checkbox' && !el.checked;
-  });
-
-  if (unchecked.length > 0) {
-    alert('Please check all declaration boxes before submitting.');
-    return;
-  }
-
-  const ref = 'INF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-
-  // Calculate final numbers to send
-  const amt = parseFloat(document.getElementById('calcAmount').value) || 0;
-  const months = parseInt(document.getElementById('calcMonths').value) || 1;
-  const rate = amt > 1000 ? 0.40 : 0.30;
-  let total = amt + (amt * rate * months) + (amt * SERVICE_FEE_RATE);
-  if (isGameWon) total -= (total * 0.02);
-
-  const appData = {
-    reference_number: ref,
-    first_name: document.getElementById('firstName').value,
-    last_name: document.getElementById('lastName').value,
-    id_number: document.getElementById('idNumber').value,
-    dob: document.getElementById('dob').value,
-    email: document.getElementById('email').value,
-    cell_phone: document.getElementById('cellPhone').value,
-    purpose: document.getElementById('purpose').value,
-    bank_name: document.getElementById('bankName').value,
-    bank_code: document.getElementById('bankCode').value,
-    acc_num: document.getElementById('accNum').value,
-    acc_type: document.getElementById('accType').value,
-    description: document.getElementById('loanDescription').value,
-    guarantor_name: document.getElementById('guarantorName').value,
-    guarantor_id: document.getElementById('guarantorId').value,
-    guarantor_phone: document.getElementById('guarantorPhone').value,
-    guarantor_rel: document.getElementById('guarantorRel').value,
-    popia_consent: document.getElementById('chk2').checked ? 1 : 0,
-    loan_amount: amt,
-    term_months: months,
-    total_settlement: total,
-    discount_applied: isGameWon ? 1 : 0
-  };
-
-  // Convert to FormData to support file uploads
-  const formData = new FormData();
-  Object.keys(appData).forEach(key => formData.append(key, appData[key]));
-  Object.keys(uploadedFiles).forEach(key => formData.append(key, uploadedFiles[key]));
-
+  console.log('🚀 submitApp() called!');
+  
   try {
+    const checks = ['chk1', 'chk2', 'chk3'];
+    console.log('Checking declaration boxes...');
+    const unchecked = checks.filter(id => {
+      const el = document.getElementById(id);
+      console.log(`Checkbox ${id}:`, el ? el.checked : 'NOT FOUND');
+      return el && el.type === 'checkbox' && !el.checked;
+    });
+
+    if (unchecked.length > 0) {
+      alert('Please check all declaration boxes before submitting.');
+      return;
+    }
+
+    const ref = 'INF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    console.log('Reference number:', ref);
+
+    // Calculate final numbers to send
+    const amt = parseFloat(document.getElementById('calcAmount').value) || 0;
+    const months = parseInt(document.getElementById('calcMonths').value) || 1;
+    const rate = amt > 1000 ? 0.40 : 0.30;
+    let total = amt + (amt * rate * months) + (amt * SERVICE_FEE_RATE);
+    if (isGameWon) total -= (total * 0.02);
+
+    console.log('Building application data...');
+    const appData = {
+      reference_number: ref,
+      first_name: document.getElementById('firstName').value,
+      last_name: document.getElementById('lastName').value,
+      id_number: document.getElementById('idNumber').value,
+      dob: document.getElementById('dob').value,
+      email: document.getElementById('email').value,
+      cell_phone: document.getElementById('cellPhone').value,
+      purpose: document.getElementById('purpose').value,
+      bank_name: document.getElementById('bankName').value,
+      bank_code: document.getElementById('bankCode').value,
+      acc_num: document.getElementById('accNum').value,
+      acc_type: document.getElementById('accType').value,
+      description: document.getElementById('loanDescription').value,
+      guarantor_name: document.getElementById('guarantorName').value,
+      guarantor_id: document.getElementById('guarantorId').value,
+      guarantor_phone: document.getElementById('guarantorPhone').value,
+      guarantor_rel: document.getElementById('guarantorRel').value,
+      popia_consent: document.getElementById('chk2').checked ? 1 : 0,
+      loan_amount: amt,
+      term_months: months,
+      total_settlement: total,
+      discount_applied: isGameWon ? 1 : 0
+    };
+    console.log('Application data:', appData);
+
+    // Convert to FormData to support file uploads
+    console.log('Preparing FormData with', Object.keys(uploadedFiles).length, 'files...');
+    const formData = new FormData();
+    Object.keys(appData).forEach(key => formData.append(key, appData[key]));
+    Object.keys(uploadedFiles).forEach(key => {
+      console.log('Adding file:', key, uploadedFiles[key].name);
+      formData.append(key, uploadedFiles[key]);
+    });
+
+    console.log('Sending request to:', `${API_BASE_URL}/apply`);
     const response = await fetch(`${API_BASE_URL}/apply`, {
       method: 'POST',
       body: formData
     });
 
+    console.log('Response status:', response.status);
     const result = await response.json();
+    console.log('Response data:', result);
 
     if (result.success) {
       // Only update UI if the server successfully saved the application
@@ -445,9 +459,15 @@ async function initWhatsApp() {
     waBtn.href = `https://wa.me/${selectedNumber}?text=${encodeURIComponent(baseMessage + nameStr)}`;
   };
 
-  // Update the link whenever the user interacts with the button
+  // Update the link whenever the user interacts with the button or name fields
   waBtn.addEventListener('mouseenter', updateWhatsAppLink);
   waBtn.addEventListener('click', updateWhatsAppLink);
+  
+  // Update when name fields change
+  const firstNameInput = document.getElementById('firstName');
+  const lastNameInput = document.getElementById('lastName');
+  if (firstNameInput) firstNameInput.addEventListener('input', updateWhatsAppLink);
+  if (lastNameInput) lastNameInput.addEventListener('input', updateWhatsAppLink);
 
   updateWhatsAppLink(); // Set initial link
   document.body.appendChild(waBtn);

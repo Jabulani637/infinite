@@ -58,34 +58,82 @@ initDb();
 // ---------------------------------------------------------------------------
 // Supabase Storage (for uploaded documents)
 // ---------------------------------------------------------------------------
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY // service role key, NOT the anon key - keep this server-side only
-);
 const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'documents';
 const STORAGE_PROVIDER = process.env.STORAGE_PROVIDER || 'supabase';
 
-// S3 Client Setup (for S3 protocol compatibility)
-const s3Client = new S3Client({
-    endpoint: process.env.S3_ENDPOINT,
-    region: process.env.S3_REGION || 'eu-west-1',
-    credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-    },
-    forcePathStyle: true,
-});
-const S3_BUCKET = process.env.S3_BUCKET || 'documents';
+// Validate required environment variables
+function validateStorageConfig() {
+    if (STORAGE_PROVIDER === 'supabase') {
+        if (!process.env.SUPABASE_URL) {
+            console.warn('⚠️  SUPABASE_URL is not set!');
+        }
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_API_KEY;
+        if (!serviceKey || serviceKey === 'your-service-role-key') {
+            console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_ROLE_API_KEY is not set! File uploads will fail.');
+        } else {
+            console.log('✅ Supabase Service Role Key found');
+        }
+        console.log(`📦 Storage bucket: ${STORAGE_BUCKET}`);
+    } else if (STORAGE_PROVIDER === 's3') {
+        const s3Endpoint = process.env.S3_ENDPOINT || process.env.ENDPOINT_URL;
+        if (!s3Endpoint) {
+            console.warn('⚠️  S3_ENDPOINT / ENDPOINT_URL is not set!');
+        }
+        const s3AccessKey = process.env.S3_ACCESS_KEY_ID || process.env.ACCESS_KEY_ID;
+        if (!s3AccessKey || s3AccessKey === 'your-access-key-id') {
+            console.warn('⚠️  S3_ACCESS_KEY_ID / ACCESS_KEY_ID is not set!');
+        }
+        const s3Secret = process.env.S3_SECRET_ACCESS_KEY || process.env.SECRET_ACCESS_KEY;
+        if (!s3Secret || s3Secret === 'your-secret-access-key') {
+            console.warn('⚠️  S3_SECRET_ACCESS_KEY / SECRET_ACCESS_KEY is not set!');
+        }
+    }
+    console.log(`📦 Storage provider: ${STORAGE_PROVIDER}`);
+}
+
+// Initialize storage clients
+let supabase = null;
+let s3Client = null;
+
+if (STORAGE_PROVIDER === 'supabase') {
+    supabase = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_API_KEY // service role key, NOT the anon key - keep this server-side only
+    );
+} else if (STORAGE_PROVIDER === 's3') {
+    s3Client = new S3Client({
+        endpoint: process.env.S3_ENDPOINT || process.env.ENDPOINT_URL,
+        region: process.env.S3_REGION || process.env.REGION || 'eu-west-1',
+        credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID || process.env.ACCESS_KEY_ID || '',
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || process.env.SECRET_ACCESS_KEY || '',
+        },
+        forcePathStyle: true,
+    });
+}
+
+const S3_BUCKET = process.env.S3_BUCKET || STORAGE_BUCKET;
+
+// Validate config on startup
+validateStorageConfig();
 
 /**
  * Uploads a buffer to Supabase Storage (bucket should be PRIVATE - these are ID docs / bank statements).
  * Returns the storage path (not a public URL).
  */
 async function uploadToSupabaseStorage(buffer, storagePath, mimetype) {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_API_KEY;
+    if (!serviceKey || serviceKey === 'your-service-role-key') {
+        throw new Error('SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_ROLE_API_KEY is not configured. Please set it in your .env file.');
+    }
+    
     const { error } = await supabase.storage
         .from(STORAGE_BUCKET)
         .upload(storagePath, buffer, { contentType: mimetype, upsert: true });
-    if (error) throw error;
+    if (error) {
+        console.error('Supabase storage error:', error);
+        throw new Error(`Supabase upload failed: ${error.message}. Make sure the '${STORAGE_BUCKET}' bucket exists and is private.`);
+    }
     return storagePath;
 }
 
@@ -100,8 +148,13 @@ async function uploadToS3Storage(buffer, storagePath, mimetype) {
         Body: buffer,
         ContentType: mimetype,
     });
-    await s3Client.send(command);
-    return storagePath;
+    try {
+        await s3Client.send(command);
+        return storagePath;
+    } catch (error) {
+        console.error('S3 storage error:', error);
+        throw new Error(`S3 upload failed: ${error.message}`);
+    }
 }
 
 /** Generates a short-lived signed URL for a private document (admin use only). */
@@ -109,7 +162,10 @@ async function getSignedDocUrl(storagePath, expiresInSeconds = 300) {
     const { data, error } = await supabase.storage
         .from(STORAGE_BUCKET)
         .createSignedUrl(storagePath, expiresInSeconds);
-    if (error) throw error;
+    if (error) {
+        console.error('Supabase signed URL error:', error);
+        throw error;
+    }
     return data.signedUrl;
 }
 
@@ -275,21 +331,30 @@ app.post('/api/apply', applyLimiter, docUploadFields, async (req, res) => {
     const missingFiles = [];
     const fileBuffers = {}; // keyed by column name, used later for the email bundle
     try {
+        console.log('Starting file uploads...');
         for (const field of Object.keys(fileMap)) {
             if (req.files && req.files[field]) {
                 const file = req.files[field][0];
                 const ext = path.extname(file.originalname) || '';
                 const storagePath = `applications/${appData.reference_number}/${fileMap[field]}${ext}`;
+                console.log(`Uploading ${field} to ${storagePath}...`);
                 await uploadToStorage(file.buffer, storagePath, file.mimetype);
+                console.log(`Successfully uploaded ${field}`);
                 appData[fileMap[field]] = storagePath; // store the path, bucket is private
                 fileBuffers[fileMap[field]] = file;
             } else {
                 missingFiles.push(`Document ${field} is required.`);
             }
         }
+        console.log('All files uploaded successfully!');
     } catch (uploadErr) {
-        console.error('Storage upload error:', uploadErr);
-        return res.status(500).json({ success: false, message: 'File upload failed. Please try again.' });
+        console.error('Storage upload error details:', uploadErr);
+        console.error('Error message:', uploadErr.message);
+        console.error('Error stack:', uploadErr.stack);
+        return res.status(500).json({ 
+            success: false, 
+            message: `File upload failed: ${uploadErr.message}. Please check your Supabase credentials.` 
+        });
     }
 
     if (missingFiles.length > 0) {

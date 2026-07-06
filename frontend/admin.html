@@ -38,16 +38,19 @@
     <!-- Main Dashboard (Hidden by default) -->
     <div id="dashboardContainer" class="dashboard-layout" style="display: none;">
         <!-- Sidebar -->
+
         <aside class="sidebar glass-panel">
             <div class="sidebar-header">
                 <i class="fa-solid fa-infinity"></i>
                 <h2>Admin</h2>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="#" id="nav-applications" class="nav-btn" data-target="applications-view"><i class="fa-solid fa-file-invoice"></i> Applications</a></li>
+                <li class="active"><a href="#" id="nav-applications" class="nav-btn" data-target="applications-view"><i class="fa-solid fa-file-invoice"></i> Dashboard</a></li>
                 <li><a href="#" id="nav-settings" class="nav-btn" data-target="settings-view"><i class="fa-solid fa-gear"></i> Settings</a></li>
                 <li><a href="#" id="nav-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             </ul>
+
+
         </aside>
 
         <!-- Main Content -->
@@ -57,11 +60,17 @@
                     <i class="fa-solid fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Search applications...">
                 </div>
+
                 <div class="user-info">
                     <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
                     <span>Administrator</span>
+                    <span class="topbar-date" id="topbarDateTime" aria-live="polite"></span>
+
+                    <a href="#" id="topbarLogoutBtn" style="margin-left: 8px;">Logout</a>
+
                 </div>
             </header>
+
 
             <div class="content-area">
                 <div class="page-header">

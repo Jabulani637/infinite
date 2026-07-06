@@ -73,6 +73,25 @@ document.addEventListener('DOMContentLoaded', () => {
         adminPasswordInput.value = '';
     });
 
+    // Top bar date/time (visual only)
+    const topbarDateTime = document.getElementById('topbarDateTime');
+    if (topbarDateTime) {
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const renderTime = () => {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = pad2(d.getMonth() + 1);
+            const dd = pad2(d.getDate());
+            const hh = pad2(d.getHours());
+            const min = pad2(d.getMinutes());
+            const ss = pad2(d.getSeconds());
+            topbarDateTime.textContent = `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
+        };
+        renderTime();
+        setInterval(renderTime, 1000);
+    }
+
+
     function showDashboard() {
         loginScreen.style.display = 'none';
         dashboardContainer.style.display = 'flex';

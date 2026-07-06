@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Infinity Admin</title>
+    <title>Admin Portal - Infinity Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="logo/infiniteloans-symbol.svg">
     <link rel="stylesheet" href="admin.css?v=3">
@@ -26,7 +26,7 @@
                         <input type="password" id="adminPassword" placeholder="Enter admin password" required>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Login to Dashboard</button>
+                <button type="submit" class="btn btn-primary btn-block">Login to Portal</button>
                 <div id="loginError" class="error-msg"></div>
                 <div style="text-align: center; margin-top: 20px;">
                     <a href="index.html" style="color: #888888; text-decoration: none; font-size: 0.85rem; font-family: 'Inter', sans-serif;"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i>Return to Main Website</a>
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Main Dashboard (Hidden by default) -->
+    <!-- Main Portal (Hidden by default) -->
     <div id="dashboardContainer" class="dashboard-layout" style="display: none;">
         <!-- Sidebar -->
 
@@ -45,7 +45,7 @@
                 <h2>Admin</h2>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="#" id="nav-applications" class="nav-btn" data-target="applications-view"><i class="fa-solid fa-file-invoice"></i> Dashboard</a></li>
+                <li class="active"><a href="#" id="nav-applications" class="nav-btn" data-target="applications-view"><i class="fa-solid fa-file-invoice"></i> Portal</a></li>
                 <li><a href="#" id="nav-settings" class="nav-btn" data-target="settings-view"><i class="fa-solid fa-gear"></i> Settings</a></li>
                 <li><a href="#" id="nav-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             </ul>
@@ -156,10 +156,10 @@
     </div>
 
     <!-- Application Details Modal -->
-    <div id="detailsModal" class="modal">
+    <div id="detailsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detailsModalTitle">
         <div class="modal-content glass-panel">
             <div class="modal-header">
-                <h2>Application Details</h2>
+                <h2 id="detailsModalTitle">Application Details</h2>
                 <span class="close-btn" id="closeModal">&times;</span>
             </div>
             <div class="modal-body" id="modalBody">
@@ -177,6 +177,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="config.js?v=1"></script>
     <script src="admin.js?v=4"></script>

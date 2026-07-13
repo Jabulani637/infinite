@@ -4,3 +4,4 @@ backend/.env
 frontend/.env
 backend/infinity.db
 .DS_Store
+infinite/

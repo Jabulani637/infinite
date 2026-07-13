@@ -131,13 +131,7 @@
                 </div>
             </div>
 
-            <div class="progress-bar" id="progressBar">
-                <div class="prog-step active" onclick="goStep(1)"><span class="prog-step-num">1</span>Personal</div>
-                <div class="prog-step" onclick="goStep(2)"><span class="prog-step-num">2</span>Contact</div>
-                <div class="prog-step" onclick="goStep(3)"><span class="prog-step-num">3</span>Loan Details</div>
-                <div class="prog-step" onclick="goStep(4)"><span class="prog-step-num">4</span>Guarantor</div>
-                <div class="prog-step" onclick="goStep(5)"><span class="prog-step-num">5</span>Documents</div>
-            </div>
+
 
             <form id="loanForm" onsubmit="event.preventDefault();">
                 <!-- Step 1: Personal -->
@@ -358,7 +352,19 @@
                 </div>
             </form>
 
+            <div id="submitLoaderOverlay" aria-live="polite" aria-busy="true">
+                <div id="submitLoaderCard">
+                    <div id="submitLoaderSpinner" aria-hidden="true"></div>
+                    <div id="submitLoaderTitle">Processing your application</div>
+                    <div id="submitLoaderText" id="submitLoaderText">Preparing submission…</div>
+                    <div id="submitLoaderBarWrap" aria-hidden="true" style="margin-top: 14px;">
+                        <div id="submitLoaderBar"></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="successScreen" class="success-screen">
+
                 <div class="success-icon">
                     <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                 </div>

@@ -102,6 +102,7 @@ function setStep(n) {
   document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+
 async function submitApp() {
   console.log('🚀 submitApp() called!');
   
@@ -178,8 +179,9 @@ async function submitApp() {
     if (result.success) {
       // Only update UI if the server successfully saved the application
       document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
-      document.getElementById('progressBar').style.display = 'none';
       document.getElementById('refNum').textContent = ref;
+
+
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -202,6 +204,7 @@ async function submitApp() {
 /* PROGRESS PERSISTENCE */
 function saveProgress() {
   const formData = {};
+
   const inputs = document.querySelectorAll('#apply input, #apply select, #apply textarea');
   
   inputs.forEach((input, index) => {

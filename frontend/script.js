@@ -105,9 +105,19 @@ function setStep(n) {
 
 async function submitApp() {
   console.log('🚀 submitApp() called!');
-  
+
+  // Prevent double submission + show loader overlay
+  const submitBtn = document.querySelector('.btn-submit');
+  const overlay = document.getElementById('submitLoaderOverlay');
+  const loaderText = document.getElementById('submitLoaderText');
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (overlay) overlay.style.display = 'flex';
+  if (loaderText) loaderText.textContent = 'Preparing submission…';
+
   try {
     const checks = ['chk1', 'chk2', 'chk3'];
+
     console.log('Checking declaration boxes...');
     const unchecked = checks.filter(id => {
       const el = document.getElementById(id);
@@ -197,8 +207,13 @@ async function submitApp() {
   } catch (err) {
     console.error('Error submitting application:', err);
     alert('Could not connect to the server. Please check your internet connection or try again later.');
+  } finally {
+    // Always hide loader + re-enable button
+    if (overlay) overlay.style.display = 'none';
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
+
 
 
 /* PROGRESS PERSISTENCE */

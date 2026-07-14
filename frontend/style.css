@@ -1,38 +1,28 @@
 /* Infinite main stylesheet */
 
 :root {
+  /* 2016-simple palette (minimal accents, minimal glow) */
+  --bg-1: #0b1b3a;
+  --bg-2: #08142b;
+  --panel: #0f274f;
+  --panel-2: #0b1b3a;
+
   --white: #ffffff;
-  --black: #0b0f17;
+  --text: rgba(255,255,255,0.88);
+  --text-muted: rgba(255,255,255,0.7);
 
-  /* Primary (dominant) */
-  --primary: #00ffff; /* Cyan */
+  /* Single accent */
+  --accent: #d4af37; /* gold */
 
-  /* Secondary base blues */
-
-  --navy: #081a3a;
-  --navy-mid: #0c2553;
-
-  --gold: #d4af37;
-  --gold-pale: rgba(212, 175, 55, 0.18);
+  --navy: #0b1b3a;
+  --navy-mid: #08142b;
 
   --success: #1f8a3b;
   --danger: #b3001b;
 
-
-  --border-light: rgba(255, 255, 255, 0.18);
-
-  --text-main: #0b0f17;
-  --text-muted: rgba(11, 15, 23, 0.68);
-
-  --text-light: rgba(255, 255, 255, 0.85);
-  --text-secondary: rgba(255, 255, 255, 0.7);
-
-  --shadow-soft: 0 12px 30px rgba(0,0,0,0.18);
-
-  --primary: #00bfff;
-  --primary-ink: #051226;
-
+  --border: rgba(255, 255, 255, 0.14);
 }
+
 
 * {
   box-sizing: border-box;
@@ -45,9 +35,10 @@ html, body {
 body {
   margin: 0;
   font-family: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: linear-gradient(180deg, #07122a 0%, #07102a 40%, #060b18 100%);
-  color: var(--white);
+  background: var(--bg-1);
+  color: var(--text);
 }
+
 
 a {
   color: inherit;
@@ -67,51 +58,54 @@ a {
   align-items: center;
   justify-content: center;
   padding: 12px 18px;
-  border-radius: 10px;
-  background: linear-gradient(180deg, var(--gold) 0%, #c79a2f 100%);
-  color: var(--primary-ink);
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.22);
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #0b1b3a;
+  font-weight: 700;
+  letter-spacing: 0;
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,0.15);
+  transition: background 160ms ease, border-color 160ms ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(212, 175, 55, 0.28);
+  background: #c9a735;
 }
+
 
 .btn-reset,
 .btn-next,
 .btn-back,
 .btn-submit {
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.04);
-  color: var(--white);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
   transition: background 160ms ease, transform 160ms ease, border-color 160ms ease;
+  box-shadow: none;
 }
 
 .btn-next,
 .btn-submit {
-  background: rgba(212, 175, 55, 0.16);
+  background: rgba(212, 175, 55, 0.18);
   border-color: rgba(212, 175, 55, 0.35);
 }
 
 .btn-back {
-  opacity: 0.92;
+  opacity: 0.95;
 }
 
 .btn-reset:hover,
 .btn-next:hover,
 .btn-back:hover,
 .btn-submit:hover {
-  background: rgba(255,255,255,0.07);
-  transform: translateY(-1px);
+  background: rgba(255,255,255,0.10);
+  transform: none;
 }
+
 
 /* Nav */
 .home-fab {
@@ -120,12 +114,13 @@ a {
   left: 18px;
   z-index: 30;
   padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  font-weight: 800;
-  backdrop-filter: blur(6px);
+  border-radius: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  backdrop-filter: none;
 }
+
 
 nav {
   position: sticky;
@@ -203,30 +198,32 @@ nav {
 
 .nav-cta {
   padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(212, 175, 55, 0.14);
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  font-weight: 900;
-  color: var(--white);
+  border-radius: 0;
+  background: var(--accent);
+  border: 1px solid rgba(0,0,0,0.2);
+  font-weight: 700;
+  color: #0b1b3a;
 }
 
-/* Urgency banner */
+
+/* Urgency banner (2016 simple) */
 .urgency-banner {
   margin: 18px auto 10px;
   width: min(980px, 92%);
-  background: rgba(212, 175, 55, 0.14);
-  border: 1px solid rgba(212, 175, 55, 0.34);
-  color: rgba(255,255,255,0.92);
-  border-radius: 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 0;
   padding: 14px 16px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
 }
 
 #timer {
-  color: var(--gold);
-  font-weight: 1000;
+  color: var(--accent);
+  font-weight: 700;
 }
+
 
 /* Sections */
 .hero {

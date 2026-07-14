@@ -4,6 +4,10 @@
   --white: #ffffff;
   --black: #0b0f17;
 
+  /* Primary (dominant) */
+  --primary: #00bfff; /* DeepSkyBlue */
+
+  /* Secondary base blues */
   --navy: #081a3a;
   --navy-mid: #0c2553;
 
@@ -12,6 +16,7 @@
 
   --success: #1f8a3b;
   --danger: #b3001b;
+
 
   --border-light: rgba(255, 255, 255, 0.18);
 
@@ -919,8 +924,61 @@ footer {
   line-height: 1.5;
 }
 
+/* WhatsApp Floating Button */
+.whatsapp-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1001;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(212, 175, 55, 0.20);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+}
+
+.whatsapp-fab svg {
+  width: 30px;
+  height: 30px;
+  color: var(--gold);
+}
+
+.wa-tooltip {
+  position: absolute;
+  right: 64px;
+  bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(7, 18, 42, 0.95);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.92);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 160ms ease, transform 160ms ease;
+  pointer-events: none;
+}
+
+.whatsapp-fab:hover .wa-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.wa-chat-label {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
 /* Login/admin-like small elements used in JS */
 .success-screen { color: var(--white); }
+
 
 /* Responsive */
 @media (max-width: 900px) {

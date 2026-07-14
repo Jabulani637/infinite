@@ -5,9 +5,10 @@
   --black: #0b0f17;
 
   /* Primary (dominant) */
-  --primary: #00bfff; /* DeepSkyBlue */
+  --primary: #00ffff; /* Cyan */
 
   /* Secondary base blues */
+
   --navy: #081a3a;
   --navy-mid: #0c2553;
 
@@ -989,18 +990,36 @@ footer {
 .success-screen { color: var(--white); }
 
 
-/* Responsive */
-@media (max-width: 900px) {
-  .hero-stats { grid-template-columns: 1fr; }
-  .trust-bar { grid-template-columns: 1fr; }
-  .how-grid { grid-template-columns: 1fr; }
-  .footer-top { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .calc-inputs { grid-template-columns: 1fr; }
-  .upload-required-tags { grid-template-columns: 1fr; }
+/* Responsive (mobile-first) */
+/* Default is mobile-friendly */
+
+@media (min-width: 700px) {
+  .nav-links {
+    flex-direction: row;
+    position: static;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex !important;
+  }
+
+  .menu-toggle { display: none; }
+
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 700px) {
+@media (min-width: 900px) {
+  .hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .trust-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .how-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .footer-top { grid-template-columns: 1.2fr 1fr 1fr 1fr; }
+  .calc-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .upload-required-tags { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 699px) {
+
   .menu-toggle { display: inline-block; }
   .nav-links {
     position: absolute;

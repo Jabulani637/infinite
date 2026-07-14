@@ -466,15 +466,11 @@ async function initWhatsApp() {
 
   const updateWhatsAppLink = () => {
     const tooltip = document.getElementById('waTooltip');
-    const fName = document.getElementById('firstName')?.value.trim() || "";
-    const lName = document.getElementById('lastName')?.value.trim() || "";
-    const nameStr = (fName || lName) ? ` My name is ${fName} ${lName}.` : "";
-    
     const randomIdx = Math.floor(Math.random() * adminNumbers.length);
     const selectedNumber = adminNumbers[randomIdx];
     
     const baseMessage = "Hello, I have a question regarding the Infinite loan application.";
-    waBtn.href = `https://wa.me/${selectedNumber}?text=${encodeURIComponent(baseMessage + nameStr)}`;
+    waBtn.href = `https://wa.me/${selectedNumber}?text=${encodeURIComponent(baseMessage)}`;
   };
 
   // Update the link whenever the user interacts with the button or name fields
